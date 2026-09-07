@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CallFlow — Call Reminder</title>
+
+    <style>
+        /* =========================
+           RESET
+        ========================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* =========================
+           BODY
+        ========================== */
+
+        body {
+            min-height: 100vh;
+            font-family: Inter, Arial, sans-serif;
+
+            background:
+                radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.20), transparent 30%),
+                radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.18), transparent 30%),
+                #07111f;
+
+            color: white;
+            padding: 40px 20px;
+        }
+
+        /* =========================
+           MAIN CONTAINER
+        ========================== */
+
+        .app {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* =========================
+           HEADER
+        ========================== */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            border-radius: 15px;
+
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #10b981
+            );
+
+            font-size: 25px;
+
+            box-shadow:
+                0 10px 30px rgba(37, 99, 235, 0.25);
+        }
+
+        .logo-text h1 {
+            font-size: 25px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 3px;
+        }
+
+        .counter {
+            padding: 10px 16px;
+            border-radius: 30px;
+
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        /* =========================
+           LAYOUT
+        ========================== */
+
+        .layout {
+            display: grid;
+            grid-template-columns: 390px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* =========================
+           PANELS
+        ========================== */
+
+        .panel {
+            background: rgba(15, 29, 48, 0.82);
+
+            border: 1px solid rgba(255, 255, 255, 0.09);
+
+            border-radius: 24px;
+
+            padding: 26px;
+
+            backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .panel-title {
+            margin-bottom: 24px;
+        }
+
+        .panel-title h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .panel-title p {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        /* =========================
+           FORM
+        ========================== */
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border-radius: 12px;
+
+            border: 1px solid #263b56;
+
+            background: #0b1a2c;
+
+            color: white;
+
+            outline: none;
+
+            font-size: 14px;
+
+            transition: 0.25s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #64748b;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #10b981;
+
+            box-shadow:
+                0 0 0 3px rgba(16, 185, 129, 0.12);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        option {
+            background: #0b1a2c;
+        }
+
+        /* =========================
+           ERROR MESSAGE
+        ========================== */
+
+        .error {
+            color: #fb7185;
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        /* =========================
+           BUTTON
+        ========================== */
+
+        .add-btn {
+            width: 100%;
+
+            border: none;
+            border-radius: 13px;
+
+            padding: 14px;
+
+            color: white;
+
+            font-size: 15px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #10b981
+            );
+
+            box-shadow:
+                0 10px 25px rgba(16, 185, 129, 0.18);
+
+            transition: 0.25s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 14px 30px rgba(16, 185, 129, 0.25);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        /* =========================
+           RIGHT SECTION
+        ========================== */
+
+        .reminders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+        .reminders-header h2 {
+            font-size: 20px;
+        }
+
+        .reminders-header span {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* =========================
+           CARD STACK
+        ========================== */
+
+        .cards-area {
+            min-height: 430px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            position: relative;
+        }
+
+        .card {
+            width: 100%;
+
+            min-height: 360px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(20, 43, 70, 0.98),
+                    rgba(10, 27, 45, 0.98)
+                );
+
+            border: 1px solid rgba(255, 255, 255, 0.10);
+
+            border-radius: 24px;
+
+            padding: 30px;
+
+            position: absolute;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.35);
+
+            transition: 0.35s ease;
+        }
+
+        .card:nth-child(2) {
+            transform: translateY(12px) scale(0.96);
+            opacity: 0.55;
+            z-index: 0;
+        }
+
+        .card:nth-child(3) {
+            transform: translateY(22px) scale(0.92);
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        .card.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            z-index: 5;
+        }
+
+        /* =========================
+           CARD TOP
+        ========================== */
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            margin-bottom: 25px;
+        }
+
+        .person {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 65px;
+            height: 65px;
+
+            border-radius: 18px;
+
+            object-fit: cover;
+
+            border: 2px solid rgba(16, 185, 129, 0.6);
+
+            background: #12253c;
+        }
+
+        .person h3 {
+            font-size: 21px;
+            margin-bottom: 5px;
+        }
+
+        .person p {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        /* =========================
+           PRIORITY
+        ========================== */
+
+        .priority {
+            padding: 7px 11px;
+            border-radius: 20px;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+        }
+
+        .priority.high {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fb7185;
+        }
+
+        .priority.medium {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fbbf24;
+        }
+
+        .priority.low {
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+        }
+
+        /* =========================
+           CARD DETAILS
+        ========================== */
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+
+            margin-bottom: 25px;
+        }
+
+        .detail-box {
+            padding: 15px;
+
+            border-radius: 15px;
+
+            background: rgba(255, 255, 255, 0.045);
+
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .detail-box small {
+            color: #64748b;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .detail-box strong {
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+
+        .purpose {
+            padding: 17px;
+
+            border-left: 3px solid #10b981;
+
+            background: rgba(16, 185, 129, 0.05);
+
+            border-radius: 10px;
+
+            color: #cbd5e1;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 22px;
+        }
+
+        /* =========================
+           CARD ACTIONS
+        ========================== */
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn,
+        .delete-btn {
+            border: none;
+            cursor: pointer;
+
+            border-radius: 11px;
+
+            padding: 10px 16px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            transition: 0.2s;
+        }
+
+        .nav-btn {
+            color: #dbeafe;
+            background: #163457;
+        }
+
+        .nav-btn:hover {
+            background: #1d4d7d;
+            transform: translateY(-1px);
+        }
+
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.10);
+            color: #fb7185;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.18);
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================== */
+
+        .empty {
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            width: 75px;
+            height: 75px;
+
+            margin: 0 auto 15px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            border-radius: 22px;
+
+            background: rgba(37, 99, 235, 0.10);
+
+            font-size: 32px;
+        }
+
+        .empty h3 {
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .empty p {
+            font-size: 13px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 850px) {
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-area {
+                min-height: 450px;
+            }
+        }
+
+        @media (max-width: 550px) {
+
+            body {
+                padding: 20px 12px;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+
+            .counter {
+                display: none;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .details {
+                grid-template-columns: 1fr;
+            }
+
+            .card-top {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <div class="logo-area">
+
+                <div class="logo">
+                    📞
+                </div>
+
+                <div class="logo-text">
+                    <h1>CallFlow</h1>
+                    <p>Your personal call reminder</p>
+                </div>
+
+            </div>
+
+            <div class="counter">
+                <span id="countDisplay">0</span> reminders
+            </div>
+
+        </header>
+
+
+        <div class="layout">
+
+            <!-- =========================
+                 FORM
+            ========================== -->
+
+            <section class="panel">
+
+                <div class="panel-title">
+                    <h2>Add Reminder</h2>
+                    <p>Save an important call for later.</p>
+                </div>
+
+
+                <form id="reminderForm">
+
+                    <!-- IMAGE -->
+                    <div class="form-group">
+
+                        <label for="image">
+                            Profile Image URL
+                        </label>
+
+                        <input
+                            type="url"
+                            id="image"
+                            placeholder="https://example.com/photo.jpg"
+                        >
+
+                        <div class="error" id="imageError">
+                            Please enter a valid image URL.
+                        </div>
+
+                    </div>
+
+
+                    <!-- NAME -->
+                    <div class="form-group">
+
+                        <label for="name">
+                            Person Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="e.g. Rahul Sharma"
+                        >
+
+                        <div class="error" id="nameError">
+                            Name is required.
+                        </div>
+
+                    </div>
+
+
+                    <!-- HOMETOWN -->
+                    <div class="form-group">
+
+                        <label for="hometown">
+                            Hometown
+                        </label>
+
+                        <input
+                            type="text"
+                            id="hometown"
+                            placeholder="e.g. Gorakhpur"
+                        >
+
+                        <div class="error" id="hometownError">
+                            Hometown is required.
+                        </div>
+
+                    </div>
+
+
+                    <!-- PURPOSE -->
+                    <div class="form-group">
+
+                        <label for="purpose">
+                            Call Purpose
+                        </label>
+
+                        <textarea
+                            id="purpose"
+                            placeholder="What do you need to discuss?"
+                        ></textarea>
+
+                        <div class="error" id="purposeError">
+                            Please enter the call purpose.
+                        </div>
+
+                    </div>
+
+
+                    <!-- PRIORITY -->
+                    <div class="form-group">
+
+                        <label for="priority">
+                            Priority
+                        </label>
+
+                        <select id="priority">
+
+                            <option value="">
+                                Select priority
+                            </option>
+
+                            <option value="High">
+                                🔴 High
+                            </option>
+
+                            <option value="Medium">
+                                🟡 Medium
+                            </option>
+
+                            <option value="Low">
+                                🟢 Low
+                            </option>
+
+                        </select>
+
+                        <div class="error" id="priorityError">
+                            Please select a priority.
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="add-btn"
+                    >
+                        + Add Call Reminder
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <!-- =========================
+                 REMINDERS
+            ========================== -->
+
+            <section class="panel">
+
+                <div class="reminders-header">
+
+                    <h2>My Reminders</h2>
+
+                    <span>
+                        Use ↑ ↓ to navigate
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="cards-area"
+                    id="cardsArea"
+                ></div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =================================
+           VARIABLES
+        ================================= */
+
+        const form = document.querySelector("#reminderForm");
+
+        const cardsArea = document.querySelector("#cardsArea");
+
+        const countDisplay =
+            document.querySelector("#countDisplay");
+
+
+        let reminders =
+            JSON.parse(localStorage.getItem("callReminders")) || [];
+
+        let currentIndex = 0;
+
+
+        /* =================================
+           SAVE TO LOCAL STORAGE
+        ================================= */
+
+        function saveReminders() {
+
+            localStorage.setItem(
+                "callReminders",
+                JSON.stringify(reminders)
+            );
+
+        }
+
+
+        /* =================================
+           FORM VALIDATION
+        ================================= */
+
+        function validateForm() {
+
+            let isValid = true;
+
+            const image =
+                document.querySelector("#image").value.trim();
+
+            const name =
+                document.querySelector("#name").value.trim();
+
+            const hometown =
+                document.querySelector("#hometown").value.trim();
+
+            const purpose =
+                document.querySelector("#purpose").value.trim();
+
+            const priority =
+                document.querySelector("#priority").value;
+
+
+            // Hide all errors
+            document.querySelectorAll(".error").forEach(error => {
+                error.style.display = "none";
+            });
+
+
+            // Name
+            if (name === "") {
+
+                document.querySelector("#nameError")
+                    .style.display = "block";
+
+                isValid = false;
+            }
+
+
+            // Hometown
+            if (hometown === "") {
+
+                document.querySelector("#hometownError")
+                    .style.display = "block";
+
+                isValid = false;
+            }
+
+
+            // Purpose
+            if (purpose === "") {
+
+                document.querySelector("#purposeError")
+                    .style.display = "block";
+
+                isValid = false;
+            }
+
+
+            // Priority
+            if (priority === "") {
+
+                document.querySelector("#priorityError")
+                    .style.display = "block";
+
+                isValid = false;
+            }
+
+
+            // Image URL
+            if (
+                image !== "" &&
+                !image.startsWith("http")
+            ) {
+
+                document.querySelector("#imageError")
+                    .style.display = "block";
+
+                isValid = false;
+            }
+
+
+            return isValid;
+        }
+
+
+        /* =================================
+           ADD NEW REMINDER
+        ================================= */
+
+        form.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+
+            if (!validateForm()) {
+                return;
+            }
+
+
+            const image =
+                document.querySelector("#image").value.trim();
+
+            const name =
+                document.querySelector("#name").value.trim();
+
+            const hometown =
+                document.querySelector("#hometown").value.trim();
+
+            const purpose =
+                document.querySelector("#purpose").value.trim();
+
+            const priority =
+                document.querySelector("#priority").value;
+
+
+            const newReminder = {
+
+                id: Date.now(),
+
+                image:
+                    image ||
+                    "https://i.pravatar.cc/150?img=12",
+
+                name: name,
+
+                hometown: hometown,
+
+                purpose: purpose,
+
+                priority: priority
+
+            };
+
+
+            reminders.push(newReminder);
+
+
+            // New reminder ko active card banayein
+            currentIndex = reminders.length - 1;
+
+
+            saveReminders();
+
+            renderCards();
+
+
+            // Form reset
+            form.reset();
+
+        });
+
+
+        /* =================================
+           RENDER CARDS
+        ================================= */
+
+        function renderCards() {
+
+            cardsArea.innerHTML = "";
+
+
+            countDisplay.textContent =
+                reminders.length;
+
+
+            // Empty state
+            if (reminders.length === 0) {
+
+                cardsArea.innerHTML = `
+
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            📅
+                        </div>
+
+                        <h3>No reminders yet</h3>
+
+                        <p>
+                            Add your first call reminder
+                            using the form.
+                        </p>
+
+                    </div>
+
+                `;
+
+                return;
+            }
+
+
+            /*
+                Cards ko stack ki tarah render karenge.
+            */
+
+            reminders.forEach((reminder, index) => {
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "card";
+
+
+                if (index === currentIndex) {
+
+                    card.classList.add("active");
+
+                }
+
+
+                const priorityClass =
+                    reminder.priority.toLowerCase();
+
+
+                card.innerHTML = `
+
+                    <div class="card-top">
+
+                        <div class="person">
+
+                            <img
+                                class="avatar"
+                                src="${reminder.image}"
+                                alt="${reminder.name}"
+                                onerror="this.src='https://i.pravatar.cc/150?img=12'"
+                            >
+
+                            <div>
+
+                                <h3>
+                                    ${reminder.name}
+                                </h3>
+
+                                <p>
+                                    📍 ${reminder.hometown}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <span
+                            class="priority ${priorityClass}"
+                        >
+                            ${reminder.priority}
+                        </span>
+
+                    </div>
+
+
+                    <div class="details">
+
+                        <div class="detail-box">
+
+                            <small>
+                                CONTACT
+                            </small>
+
+                            <strong>
+                                📞 Call
+                            </strong>
+
+                        </div>
+
+
+                        <div class="detail-box">
+
+                            <small>
+                                PRIORITY
+                            </small>
+
+                            <strong>
+                                ${reminder.priority}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="purpose">
+
+                        <strong>
+                            Call Purpose
+                        </strong>
+
+                        <br>
+
+                        ${reminder.purpose}
+
+                    </div>
+
+
+                    <div class="card-actions">
+
+                        <div class="nav-buttons">
+
+                            <button
+                                class="nav-btn"
+                                onclick="moveUp()"
+                            >
+                                ↑ Up
+                            </button>
+
+                            <button
+                                class="nav-btn"
+                                onclick="moveDown()"
+                            >
+                                ↓ Down
+                            </button>
+
+                        </div>
+
+
+                        <button
+                            class="delete-btn"
+                            onclick="deleteReminder(${reminder.id})"
+                        >
+                            🗑 Delete
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                cardsArea.appendChild(card);
+
+            });
+
+        }
+
+
+        /* =================================
+           MOVE UP
+        ================================= */
+
+        function moveUp() {
+
+            if (reminders.length === 0) {
+                return;
+            }
+
+
+            currentIndex--;
+
+
+            // Loop to last card
+            if (currentIndex < 0) {
+
+                currentIndex =
+                    reminders.length - 1;
+
+            }
+
+
+            renderCards();
+
+        }
+
+
+        /* =================================
+           MOVE DOWN
+        ================================= */
+
+        function moveDown() {
+
+            if (reminders.length === 0) {
+                return;
+            }
+
+
+            currentIndex++;
+
+
+            // Loop to first card
+            if (
+                currentIndex >=
+                reminders.length
+            ) {
+
+                currentIndex = 0;
+
+            }
+
+
+            renderCards();
+
+        }
+
+
+        /* =================================
+           DELETE REMINDER
+        ================================= */
+
+        function deleteReminder(id) {
+
+            reminders =
+                reminders.filter(
+                    reminder => reminder.id !== id
+                );
+
+
+            if (
+                currentIndex >=
+                reminders.length
+            ) {
+
+                currentIndex =
+                    Math.max(0, reminders.length - 1);
+
+            }
+
+
+            saveReminders();
+
+            renderCards();
+
+        }
+
+
+        /* =================================
+           INITIAL RENDER
+        ================================= */
+
+        renderCards();
+
+    </script>
+
+</body>
+</html>

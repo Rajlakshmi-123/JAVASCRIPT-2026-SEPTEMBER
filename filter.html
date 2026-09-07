@@ -1,0 +1,194 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Search Filter</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Search box */
+        #searchInput {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 30px;
+
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+
+            font-size: 16px;
+        }
+
+        /* Cards container */
+        #userContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        /* Profile card */
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card img {
+            width: 100px;
+            height: 100px;
+
+            border-radius: 50%;
+            object-fit: cover;
+
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #666;
+        }
+
+        .no-result {
+            text-align: center;
+            grid-column: 1 / -1;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>User Directory</h1>
+
+    <input
+        type="text"
+        id="searchInput"
+        placeholder="Search users by name..."
+    >
+
+    <div id="userContainer"></div>
+
+
+    <script>
+
+        // Array of user objects
+        const users = [
+            {
+                name: "Raj",
+                role: "Frontend Developer",
+                image: "https://i.pravatar.cc/150?img=1"
+            },
+            {
+                name: "Priya",
+                role: "Backend Developer",
+                image: "https://i.pravatar.cc/150?img=2"
+            },
+            {
+                name: "Aman",
+                role: "UI/UX Designer",
+                image: "https://i.pravatar.cc/150?img=3"
+            },
+            {
+                name: "Anjali",
+                role: "Data Scientist",
+                image: "https://i.pravatar.cc/150?img=4"
+            },
+            {
+                name: "Rahul",
+                role: "Software Engineer",
+                image: "https://i.pravatar.cc/150?img=5"
+            },
+            {
+                name: "Neha",
+                role: "Product Manager",
+                image: "https://i.pravatar.cc/150?img=6"
+            }
+        ];
+
+
+        let container = document.getElementById("userContainer");
+        let searchInput = document.getElementById("searchInput");
+
+
+        // Function to display users
+        function displayUsers(userList) {
+
+            container.innerHTML = "";
+
+            if (userList.length === 0) {
+
+                container.innerHTML =
+                    `<p class="no-result">No users found!</p>`;
+
+                return;
+            }
+
+            userList.forEach(function(user) {
+
+                let card = document.createElement("div");
+
+                card.classList.add("card");
+
+                card.innerHTML = `
+                    <img src="${user.image}" alt="${user.name}">
+                    <h2>${user.name}</h2>
+                    <p>${user.role}</p>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+
+        // Show all users when page loads
+        displayUsers(users);
+
+
+        // Real-time search
+        searchInput.addEventListener("input", function() {
+
+            let searchValue = searchInput.value.toLowerCase();
+
+            let filteredUsers = users.filter(function(user) {
+
+                return user.name
+                    .toLowerCase()
+                    .includes(searchValue);
+
+            });
+
+            displayUsers(filteredUsers);
+        });
+
+    </script>
+
+</body>
+</html>
